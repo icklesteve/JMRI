@@ -97,7 +97,7 @@ public class ProxySensorManager extends AbstractProvidingProxyManager<Sensor>
     @Override
     @Nonnull
     public String createSystemName(@Nonnull String curAddress, @Nonnull String prefix) throws jmri.JmriException {
-        return createSystemName(curAddress, prefix, SensorManager.class);
+        return createSystemName(curAddress, prefix, getNamedBeanClass());
     }
 
     @Override

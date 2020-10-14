@@ -181,8 +181,9 @@ public class ProxyTurnoutManager extends AbstractProvidingProxyManager<Turnout> 
     }
 
     @Override
+    @Nonnull
     public String createSystemName(@Nonnull String curAddress, @Nonnull String prefix) throws jmri.JmriException {
-        return createSystemName(curAddress, prefix, TurnoutManager.class);
+        return createSystemName(curAddress, prefix, getNamedBeanClass());
     }
 
     @Override

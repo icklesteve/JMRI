@@ -266,17 +266,18 @@ abstract public class AbstractProxyManager<E extends NamedBean> extends Vetoable
      *
      * @param curAddress base address to use
      * @param prefix system prefix to use
-     * @param managerType BeanType manager (method is used for Turnout and Sensor Managers)
+     * @param beanType Bean Type for manager (method is used for Turnout and Sensor Managers)
      * @return a valid system name for this connection
      * @throws JmriException if systemName cannot be created
      */
-    String createSystemName(String curAddress, String prefix, Class managerType) throws JmriException {
+    @Nonnull
+    String createSystemName(String curAddress, String prefix, Class<?> beanType) throws JmriException {
         for (Manager<E> m : mgrs) {
-            if (prefix.equals(m.getSystemPrefix()) && managerType.equals(m.getClass())) {
+            if (prefix.equals(m.getSystemPrefix()) && beanType.equals(m.getNamedBeanClass())) {
                 try {
-                    if (managerType == TurnoutManager.class) {
+                    if (beanType == Turnout.class) {
                         return ((TurnoutManager) m).createSystemName(curAddress, prefix);
-                    } else if (managerType == SensorManager.class) {
+                    } else if (beanType == Sensor.class) {
                         return ((SensorManager) m).createSystemName(curAddress, prefix);
                     } else {
                         log.warn("createSystemName requested for incompatible Manager");
