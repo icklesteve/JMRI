@@ -222,8 +222,21 @@ public class NamedBeanComboBox<B extends NamedBean> extends JComboBox<B> {
                         !userInput.isEmpty() &&
                         ((manager.isValidSystemNameFormat(userInput)) || userInput.equals(NamedBean.normalizeUserName(userInput)))) {
                     ProvidingManager<B> pm = (ProvidingManager<B>) manager;
-                    item = pm.provide(userInput);
-                    setSelectedItem(item);
+                    
+                    // A try / catch shouldn't be required here as the user input has
+                    // been validated in manager.isValidSystemNameFormat(userInput) .
+                    // Sometimes however, a Bean name will pass that test but fail
+                    // manager.validateSystemNameFormat(userInput)
+                    // If / when a unit test is added to every Abstract Bean to
+                    // ensure method consistency, this try / catch can be removed.
+                    try {
+                        item = pm.provide(userInput);
+                        setSelectedItem(item);
+                    }
+                    catch (IllegalArgumentException e){
+                        log.error("Unable to cteate {} {}",userInput,e.getMessage());
+                        return null;
+                    }
                 }
             }
         }
