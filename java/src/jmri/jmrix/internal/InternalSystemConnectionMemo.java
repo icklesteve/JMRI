@@ -305,6 +305,15 @@ public class InternalSystemConnectionMemo extends jmri.jmrix.DefaultSystemConnec
     public <B extends NamedBean> Comparator<B> getNamedBeanComparator(Class<B> type) {
         return new NamedBeanPreferNumericComparator<>();
     }
+    
+    /**
+     * Custom interval of 1ms.
+     * {@inheritDoc}
+     */
+    @Override
+    public int getDefaultOutputInterval(){
+        return 1;
+    }
 
     @Override
     public void dispose() {

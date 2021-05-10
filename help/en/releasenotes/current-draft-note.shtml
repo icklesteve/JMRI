@@ -56,7 +56,7 @@
 
         <h4>Internal</h4>
             <ul>
-                <li></li>
+                <li>Connection Output Interval reduced from 250ms to 1ms.</li>
             </ul>
 
         <h4>IPOCSMR</h4>
