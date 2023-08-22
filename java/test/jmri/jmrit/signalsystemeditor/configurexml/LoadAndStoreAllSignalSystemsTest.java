@@ -37,7 +37,7 @@ public class LoadAndStoreAllSignalSystemsTest {
                 String.format("Signal system: %s, Signal mast: %s, File %s is a http link%n",
                 signalSystem.getFolderName(), smt.getFileName(), link.getImageLink()));
 
-            File file = new File("xml/signals" + link.getImageLink());
+            File file = new File("xml" + File.separator + "signals" + link.getImageLink());
             Assertions.assertTrue( file.getCanonicalFile().exists(),
                 String.format("Signal system: %s, Signal mast: %s, File %s does not exists%n",
                 signalSystem.getFolderName(), smt.getFileName(), file.getCanonicalPath()));
@@ -64,8 +64,8 @@ public class LoadAndStoreAllSignalSystemsTest {
                 String filename = link.getImageLink();
                 link.setImageLink(link.getImageLink().replace(" ", "_"));
                 String newFilename = link.getImageLink();
-                File file = new File("xml/signals" + filename).getCanonicalFile();
-                File newFile = new File("xml/signals" + newFilename).getCanonicalFile();
+                File file = new File("xml" + File.separator + "signals" + filename).getCanonicalFile();
+                File newFile = new File("xml" + File.separator + "signals" + newFilename).getCanonicalFile();
                 Assertions.assertTrue( file.renameTo(newFile), String.format("Can rename file %s to file %s", file, newFile));
                 changed = true;
             } else {
@@ -346,11 +346,11 @@ public class LoadAndStoreAllSignalSystemsTest {
             SignalSystemXml signalSystemXml = new SignalSystemXml();
             SignalMastTypeXml signalMastXml = new SignalMastTypeXml();
 
-            SignalSystem signalSystem = signalSystemXml.load(new File(file.getParent()+"/aspects.xml"));
+            SignalSystem signalSystem = signalSystemXml.load(new File(file.getParent()+File.separator +"aspects.xml"));
 
             if (checkSpaces(signalSystem)) {
                 // If spaces have been removed from the file names, reload the signal system
-                signalSystem = signalSystemXml.load(new File(file.getParent()+"/aspects.xml"));
+                signalSystem = signalSystemXml.load(new File(file.getParent()+File.separator+"aspects.xml"));
             }
 
             checkImageLinks(signalSystem);
@@ -362,7 +362,8 @@ public class LoadAndStoreAllSignalSystemsTest {
             File parentFile = file.getParentFile();
             Assertions.assertNotNull(parentFile);
             File compFile = new File(FileUtil.getProfilePath()
-                    + "xml/signals/" + "/" + parentFile.getName() + "/" + file.getName() );
+                + "xml" + File.separator + "signals" + File.separator
+                + parentFile.getName() + File.separator + file.getName() );
             checkFile(compFile, file);
         }
     }
@@ -372,7 +373,7 @@ public class LoadAndStoreAllSignalSystemsTest {
     public void loadAndStoreTest(File file, boolean pass) throws Exception {
         String parentFile = file.getParent();
         Assertions.assertNotNull(parentFile);
-        if (!parentFile.equals("xml/signals") && !parentFile.equals("xml\\signals")) {
+        if (!parentFile.equals("xml"+File.separator+"signals") && !parentFile.equals("xml"+File.separator+"signals")) {
             loadAndStoreFileCheck(file);
         }
     }
