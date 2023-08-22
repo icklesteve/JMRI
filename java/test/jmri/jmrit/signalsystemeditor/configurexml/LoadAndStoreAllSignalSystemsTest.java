@@ -25,12 +25,12 @@ import org.junit.jupiter.params.provider.MethodSource;
 public class LoadAndStoreAllSignalSystemsTest {
 
 
-    private final boolean REMOVE_SPACES = false;
+    private final static boolean REMOVE_SPACES = false;
 
     private static String lastSignalSystem = null;
 
 
-    private void checkImageLinks(SignalSystem signalSystem, SignalMastType smt, List<ImageLink> imageLinks) throws IOException {
+    private static void checkImageLinks(SignalSystem signalSystem, SignalMastType smt, List<ImageLink> imageLinks) throws IOException {
         for (ImageLink link : imageLinks) {
 
             Assertions.assertFalse( link.getImageLink().startsWith("http:"),
@@ -45,7 +45,7 @@ public class LoadAndStoreAllSignalSystemsTest {
         }
     }
 
-    private void checkImageLinks(SignalSystem signalSystem) throws IOException {
+    private static void checkImageLinks(SignalSystem signalSystem) throws IOException {
         for (SignalMastType smt : signalSystem.getSignalMastTypes()) {
             for (Appearance appearance : smt.getAppearances()) {
                 checkImageLinks(signalSystem, smt, appearance.getImageLinks());
@@ -57,7 +57,7 @@ public class LoadAndStoreAllSignalSystemsTest {
         }
     }
 
-    private boolean checkFileForSpaces(ImageLink link, List<String> filenamesWithSpaces) throws IOException {
+    private static boolean checkFileForSpaces(ImageLink link, List<String> filenamesWithSpaces) throws IOException {
         boolean changed = false;
         if (link.getImageLink().contains(" ")) {
             if (REMOVE_SPACES) {
@@ -75,7 +75,7 @@ public class LoadAndStoreAllSignalSystemsTest {
         return changed;
     }
 
-    private boolean checkImageLinksSpaces(List<ImageLink> imageLinks, List<String> filenamesWithSpaces) throws IOException {
+    private static boolean checkImageLinksSpaces(List<ImageLink> imageLinks, List<String> filenamesWithSpaces) throws IOException {
         boolean changed = false;
         for (ImageLink link : imageLinks) {
             changed |= checkFileForSpaces(link, filenamesWithSpaces);
@@ -83,7 +83,7 @@ public class LoadAndStoreAllSignalSystemsTest {
         return changed;
     }
 
-    private boolean checkSpaces(SignalSystem signalSystem) throws IOException {
+    private static boolean checkSpaces(SignalSystem signalSystem) throws IOException {
         boolean spacesRemoved = false;
         List<String> filenamesWithSpaces = new ArrayList<>();
         Assertions.assertFalse( signalSystem.getFolderName().contains(" "), "The signal system folder name contains no spaces: " + signalSystem.getFolderName());
@@ -331,7 +331,7 @@ public class LoadAndStoreAllSignalSystemsTest {
         return true;
     }
 
-    private void loadAndStoreFileCheck(File file) throws Exception {
+    private static void loadAndStoreFileCheck(File file) throws Exception {
 
         log.debug("Start check file {}", file.getCanonicalPath());
 
