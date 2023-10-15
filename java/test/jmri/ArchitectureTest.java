@@ -275,6 +275,15 @@ public class ArchitectureTest {
             .that().resideInAPackage("jmri..")
             .should().dependOnClassesThat().resideInAPackage("org.apache.logging.log4j");
 
+    @ArchTest
+    public static final ArchRule useJmriJOptionPane = noClasses()
+            .that().doNotHaveFullyQualifiedName("jmri.util.swing.JmriJOptionPane")
+            .and().doNotHaveFullyQualifiedName("jmri.jmrit.decoderdefn.DecoderIndexFile")
+            .and().doNotHaveFullyQualifiedName("jmri.jmrit.roster.Roster")
+            .and().doNotHaveFullyQualifiedName("jmri.jmrit.roster.UpdateDecoderDefinitionAction")
+            .and().doNotHaveFullyQualifiedName("jmri.util.QuickPromptUtil")
+            .should().dependOnClassesThat().haveFullyQualifiedName("javax.swing.JOptionPane");
+
     /**
      * Confine JDOM to configurexml packages.
      */
