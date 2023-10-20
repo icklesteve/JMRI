@@ -19,6 +19,15 @@
                 <li></li>
             </ul>
 
+	    <h4><a href="http://bidib.org/index_e.html">BiDiB</a></h4>
+            <ul>
+                <li>Eckart Meyer has provided a first implementation
+                    for the
+                    <a href="http://bidib.org/index_e.html">BiDiB</a>
+                    system connection.
+                    </li>
+            </ul>
+
         <h4>CBUS</h4>
             <ul>
                 <li></li>
@@ -125,12 +134,13 @@
                     <ul>
                         <li>Better status logging of save and restore operations
                         <li>Allows user to change the default backup filename using
-                            a script like 
+                            a script like
                             <a href="https://jmri.org/jython/LCC/ChangeDefaultBackupFileName.py">jython/LCC/ChangeDefaultBackupFileName.py</a>
                         <li>Fixes a problem that could cause the configuration dialog
                             to not open for certain nodes, including the DCC-LCC Gateway.
                     </ul>
                 </li>
+                <li>Added Window and Help menus to the Configure Node window.
             </ul>
 
         <h4>Powerline</h4>
@@ -256,7 +266,7 @@
 
         <h4>LEB</h4>
             <ul>
-                <li>Added the 
+                <li>Added the
                     <a href="http://lebmodelisme.com">LEB signal decoders</a></li>
             </ul>
 
@@ -298,6 +308,11 @@
         <h4>Norsk Modelljernbane (NJM)</h4>
             <ul>
                 <li></li>
+            </ul>
+
+        <h4>Piko decoders</h4>
+            <ul>
+                <li>Add Decoder Piko BR 93 TT XP 5.1 Sound</li>
             </ul>
 
         <h4>Public Domain and DIY decoders</h4>
@@ -388,7 +403,8 @@
     <h3>DecoderPro</h3>
         <a id="DecoderPro" name="DecoderPro"></a>
         <ul>
-            <li></li>
+            <li>Fixed a bug that prevented output labels from
+                properly showing up in some decoder definitions.</li>
         </ul>
 
     <h3>CTC Tool</h3>
@@ -444,6 +460,9 @@
 
           <li>Warrant expression was not listening for warrant events.  Fixed along with the long
           description.</li>
+
+          <li>Add the <strong>GET_BLOCK_WARRANT</strong> and <strong>GET_BLOCK_TRAIN_NAME</strong>
+          OBlock actions to the OBlock Logix import.</li>
         </ul>
 
     <h3>Meters and MeterFrames</h3>
@@ -521,7 +540,7 @@
         </ul>
         <h4>Signal Systems</h4>
             <ul>
-                <li></li>
+                <li>The Italian FS-1987 signal system was updated for better operation.</li>
             </ul>
 
         <h4>Signal Heads</h4>
@@ -593,7 +612,7 @@
    <h3>Web Access</h3>
         <a id="WA" name="WA"></a>
         <ul>
-            <li></li>
+            <li>JMRI Web Frame Server can now access many of the Dialog popup boxes.</li>
         </ul>
 
     <h3>Where Used</h3>
