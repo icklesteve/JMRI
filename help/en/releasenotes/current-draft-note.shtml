@@ -644,4 +644,6 @@
         <ul>
             <li>(For developers) Our CI process has been updated to require the
             @Override annotation on overriding methods and removal of unused import statements.</li>
+            <li>(For developers) jmri.util.swing.JmriJOptionPane is preferred over javax.swing.JOptionPane
+            due to Always On Top and JmriJFrame Webserver accessibility.</li>
         </ul>
