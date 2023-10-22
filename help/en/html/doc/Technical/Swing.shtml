@@ -176,8 +176,12 @@
       <p>jmri.util.swing.JmriJOptionPane is preferred over javax.swing.JOptionPane.
       The Modality of the latter will block the whole JVM UI until they are closed.
       This causes issues with Always on Top Frames, which will also be blocked,
-      potentially with the Dialog hidden behind the Frame.</p>
-      
+      potentially with the Dialog hidden behind the Frame.
+      <br>
+      JmriJOptionPanes with a parent Component are accessible via the 
+      JMRI Web Frame Server, unlike JOptionPane.
+      </p>
+
       <!--#include virtual="/Footer.shtml" -->
     </div> <!-- closes #mainContent-->
   </div> <!-- closes #mBody-->
