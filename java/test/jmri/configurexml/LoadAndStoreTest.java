@@ -35,6 +35,6 @@ public class LoadAndStoreTest extends LoadAndStoreTestBase {
     }
 
     public LoadAndStoreTest() {
-        super(SaveType.Config, false);
+        super(SaveType.Config, true);
     }
 }
