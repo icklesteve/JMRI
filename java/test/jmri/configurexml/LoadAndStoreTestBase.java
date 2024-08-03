@@ -250,6 +250,7 @@ public class LoadAndStoreTestBase {
                     log.error("    file2:line {}: \"{}\"", lineNumber2, line2);
                     log.error("  comparing file1:\"{}\"", inFile1.getPath());
                     log.error("         to file2:\"{}\"", inFile2.getPath());
+                    log.error("In test stack :", new Exception());
                     Assert.assertEquals(line1, line2);
                 }
                 line1 = next1;
