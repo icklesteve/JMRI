@@ -1,5 +1,8 @@
 package jmri.implementation;
 
+import jmri.InstanceManager;
+import jmri.ScaleManager;
+import jmri.Timebase;
 import jmri.util.JUnitUtil;
 
 import org.junit.jupiter.api.*;
@@ -16,7 +19,7 @@ public class SignalSpeedMapTest {
     public void testLoadDefaultMap() {
         Assert.assertNotNull(jmri.InstanceManager.getDefault(SignalSpeedMap.class));
     }
-    
+
     static final String[] speeds = new String[]{
         "Cab",
         "Maximum",
@@ -31,8 +34,8 @@ public class SignalSpeedMapTest {
         "Stop"
     };
 
-    SignalSpeedMap map;
-    
+    private SignalSpeedMap map;
+
     /**
      * To avoid breaking signal systems, speed definitions should
      * never be removed from the default map. Hence we check that 
@@ -40,8 +43,8 @@ public class SignalSpeedMapTest {
      */
     @Test
     public void testAllSpeedsPresent() {
-        for (int i = 0; i < speeds.length; i++) {
-            Assert.assertTrue(map.getSpeed(speeds[i])+" must be ge 0 to be present",0<=map.getSpeed(speeds[i]));
+        for (String speed : speeds) {
+            Assertions.assertTrue( 0 <= map.getSpeed(speed), map.getSpeed(speed) + " must be ge 0 to be present");
         }
     }
 
@@ -70,12 +73,14 @@ public class SignalSpeedMapTest {
         check: while (e.hasMoreElements()) {
             name = e.nextElement();
             for (String test : speeds) {
-                if (test.equals(name)) continue check;
+                if (test.equals(name)) {
+                    continue check;
+                }
             }
             Assert.fail("Speed name \""+name+"\" not recognized");
         }        
     }
-    
+
     @Test
     public void testAppearanceSpeedsOK() {
         // check that every speed in <appearanceSpeeds> is defined
@@ -88,10 +93,32 @@ public class SignalSpeedMapTest {
         }        
     }
 
+    @Test
+    public void testmmsToMphKmph() {
+
+        Timebase timeBase = InstanceManager.getDefault(Timebase.class);
+        timeBase.setRun(false);
+
+        Assertions.assertEquals(62.1371, SignalSpeedMap.kmPhToMph(100),0.001);
+        Assertions.assertEquals(0, SignalSpeedMap.kmPhToMph(0),0.001);
+
+        Assertions.assertEquals(0f, map.mmsToKmph(0), 0.00001);
+        Assertions.assertEquals(0f, map.mmsToMph(0), 0.00001);
+
+        Assertions.assertDoesNotThrow( () -> timeBase.userSetRate(1.0d));
+        map.setLayoutScale(1); // full size
+        Assertions.assertEquals(0.036f, map.mmsToKmph(10), 0.001);
+
+        map.setLayoutScale((float)ScaleManager.getScaleByName("HO").getScaleRatio());
+        Assertions.assertEquals(3.1356f, map.mmsToKmph(10), 0.0001);
+
+        Assertions.assertDoesNotThrow( () -> timeBase.userSetRate(2.0d));
+        Assertions.assertEquals(6.2712f, map.mmsToKmph(10), 0.0001);
+    }
+
     @BeforeEach
     public void setUp() throws Exception {
         JUnitUtil.setUp();
-        JUnitUtil.resetInstanceManager();
         JUnitUtil.initInternalTurnoutManager();
         JUnitUtil.initInternalLightManager();
         JUnitUtil.initInternalSensorManager();
