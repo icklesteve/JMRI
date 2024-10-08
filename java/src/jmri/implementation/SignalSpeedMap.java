@@ -11,17 +11,18 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Vector;
+
 import javax.annotation.Nonnull;
+
 import jmri.InstanceManager;
 import jmri.InstanceManagerAutoDefault;
 import jmri.InstanceManagerAutoInitialize;
 import jmri.beans.Bean;
 import jmri.jmrit.logix.WarrantPreferences;
 import jmri.util.FileUtil;
+
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation to map Signal aspects or appearances to speed
@@ -32,26 +33,24 @@ import org.slf4j.LoggerFactory;
  *
  * @author Pete Cressman Copyright (C) 2010
  */
-public class SignalSpeedMap extends Bean implements InstanceManagerAutoDefault, InstanceManagerAutoInitialize // auto-initialize in InstanceManager
-{
+public class SignalSpeedMap extends Bean implements InstanceManagerAutoDefault, InstanceManagerAutoInitialize {
 
     private final HashMap<String, Float> _table = new LinkedHashMap<>();
     private final HashMap<String, String> _headTable = new LinkedHashMap<>();
     private int _interpretation;
     private int _sStepDelay;     // ramp step time interval
-    private int _numSteps = 4;   // num throttle steps per ramp step - deprecated
     private float _stepIncrement = 0.04f;       // ramp step throttle increment
     private float _throttleFactor = 0.75f;
     private float _scale = 87.1f;
 
-    static public final int PERCENT_NORMAL = 1;
-    static public final int PERCENT_THROTTLE = 2;
-    static public final int SPEED_MPH = 3;
-    static public final int SPEED_KMPH = 4;
+    public static final int PERCENT_NORMAL = 1;
+    public static final int PERCENT_THROTTLE = 2;
+    public static final int SPEED_MPH = 3;
+    public static final int SPEED_KMPH = 4;
     private PropertyChangeListener warrantPreferencesListener = null;
 
     public SignalSpeedMap() {
-        loadMap();
+        SignalSpeedMap.this.loadMap();
         this.warrantPreferencesListener = (PropertyChangeEvent evt) -> {
             WarrantPreferences preferences = WarrantPreferences.getDefault();
             SignalSpeedMap map = SignalSpeedMap.this;
@@ -135,6 +134,7 @@ public class SignalSpeedMap extends Bean implements InstanceManagerAutoDefault, 
             log.debug("_sStepDelay = {}", _sStepDelay);
 
             e = root.getChild("stepsPerIncrement");
+            int _numSteps;
             try {
                 _numSteps = Integer.parseInt(e.getText());
             } catch (NumberFormatException nfe) {
@@ -252,6 +252,11 @@ public class SignalSpeedMap extends Bean implements InstanceManagerAutoDefault, 
         return null;
     }
 
+    /**
+     * Get the Speed Interpretation.
+     * e.g. SPEED_KMPH, SPEED_MPH, PERCENT_NORMAL or PERCENT_THROTTLE (default)
+     * @return interpretation constant.
+     */
     public int getInterpretation() {
         return _interpretation;
     }
@@ -325,9 +330,52 @@ public class SignalSpeedMap extends Bean implements InstanceManagerAutoDefault, 
         _scale = s;
     }
 
+    /**
+     * Get the Layout Scale.
+     * @return scale value, e.g. 87.1 for HO.
+     */
     public float getLayoutScale() {
         return _scale;
     }
 
-    static private final Logger log = LoggerFactory.getLogger(SignalSpeedMap.class);
+    /**
+     * Convert speed from the actual speed of a loco travelling on the layout
+     * to scale Kilometres per Hour.
+     * JMRI has options to set both the physical Layout Scale ( Warrant Preferences ),
+     * and Time scale, via the Fast Clock settings, which are used in the calculation.
+     * Larger scales will result in a lower km/hour value than smaller scales.
+     * Larger fast clock ratios will result in higher km/hour values than 1:1 speed.
+     * @param mmsPerSec the actual loco speed in millimetres per second.
+     * @return the scaled speed in Kilometres per Hour.
+     */
+    public float mmsToKmph(float mmsPerSec) {
+        return mmsPerSec * 0.0036f * getLayoutScale() *
+            (float)InstanceManager.getDefault(jmri.Timebase.class).userGetRate();
+    }
+
+    /**
+     * Convert speed from the actual speed of a loco travelling on the layout
+     * to scale Miles per Hour.
+     * JMRI has options to set both the physical Layout Scale ( Warrant Preferences ),
+     * and Time scale, via the Fast Clock settings, which are used in the calculation.
+     * Larger scales will result in a lower mile/hour value than smaller scales.
+     * Larger fast clock ratios will result in higher mile/hour values than 1:1 speed.
+     * @param mmsPerSec the actual loco speed in millimetres per second.
+     * @return the scaled speed in Kilometres per Hour.
+     */
+    public float mmsToMph(float mmsPerSec) {
+        return kmPhToMph(mmsToKmph(mmsPerSec));
+    }
+
+    /**
+     * Convert Kilometres per hour to Miles per hour.
+     * @param kmph the speed to convert.
+     * @return the speed in Miles per Hour.
+     */
+    public static float kmPhToMph(float kmph) {
+        return kmph / 1.609344f;
+    }
+
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SignalSpeedMap.class);
+
 }
