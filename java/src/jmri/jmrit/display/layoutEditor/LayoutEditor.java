@@ -8854,15 +8854,6 @@ final public class LayoutEditor extends PanelEditor implements MouseWheelListene
         }
     }
 
-    @Override
-    public void dispose() {
-        if ( leToolBarPanel != null ) {
-            leToolBarPanel.dispose();
-        }
-        super.dispose();
-
-    }
-
     // package protected
     class TurnoutComboBoxPopupMenuListener implements PopupMenuListener {
 
@@ -9124,6 +9115,18 @@ final public class LayoutEditor extends PanelEditor implements MouseWheelListene
             result = true;
         }
         return result;
+    }
+
+    @Override
+    public void dispose() {
+        if ( leToolBarPanel != null ) {
+            leToolBarPanel.dispose();
+        }
+        if ( tools != null ) {
+            tools.dispose();
+            tools = null;
+        }
+        super.dispose();
     }
 
     // initialize logging
