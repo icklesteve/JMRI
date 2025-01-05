@@ -556,6 +556,10 @@ final public class LayoutEditor extends PanelEditor implements MouseWheelListene
             contentPane.remove(editToolBarContainerPanel);
         }
 
+        if ( leToolBarPanel != null ) {
+            leToolBarPanel.dispose();
+        }
+
         if (helpBarPanel != null) {
             contentPane.remove(helpBarPanel);
         }
@@ -8850,22 +8854,10 @@ final public class LayoutEditor extends PanelEditor implements MouseWheelListene
         }
     }
 
-//    private void rename(String inFrom, String inTo) {
-//
-//    }
     @Override
     public void dispose() {
-        if (leToolBarPanel.sensorFrame != null) {
-            leToolBarPanel.sensorFrame.dispose();
-            leToolBarPanel.sensorFrame = null;
-        }
-        if (leToolBarPanel.signalFrame != null) {
-            leToolBarPanel.signalFrame.dispose();
-            leToolBarPanel.signalFrame = null;
-        }
-        if (leToolBarPanel.iconFrame != null) {
-            leToolBarPanel.iconFrame.dispose();
-            leToolBarPanel.iconFrame = null;
+        if ( leToolBarPanel != null ) {
+            leToolBarPanel.dispose();
         }
         super.dispose();
 
