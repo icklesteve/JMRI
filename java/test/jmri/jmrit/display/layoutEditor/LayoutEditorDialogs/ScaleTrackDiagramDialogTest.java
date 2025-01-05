@@ -6,10 +6,10 @@ import javax.swing.JTextField;
 import jmri.jmrit.display.EditorFrameOperator;
 import jmri.jmrit.display.layoutEditor.LayoutEditor;
 import jmri.util.JUnitUtil;
+import jmri.util.ThreadingUtil;
 import jmri.util.swing.JemmyUtil;
 
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 
 import org.netbeans.jemmy.operators.JButtonOperator;
 import org.netbeans.jemmy.operators.JFrameOperator;
@@ -22,7 +22,7 @@ import org.netbeans.jemmy.operators.JTextFieldOperator;
  * @author George Warner Copyright (C) 2019
  */
 @Timeout(10)
-@DisabledIfSystemProperty(named = "java.awt.headless", matches = "true")
+@jmri.util.junit.annotations.DisabledIfHeadless
 public class ScaleTrackDiagramDialogTest {
 
     private LayoutEditor layoutEditor = null;
@@ -31,8 +31,8 @@ public class ScaleTrackDiagramDialogTest {
     @BeforeEach
     public void setUp() {
         JUnitUtil.setUp();
-        layoutEditor = new LayoutEditor();
-        layoutEditor.setVisible(true);
+        layoutEditor = new LayoutEditor(this.getClass().getName());
+        ThreadingUtil.runOnGUI( () -> layoutEditor.setVisible(true) );
         layoutEditor.setPanelBounds(new Rectangle2D.Double(0, 0, 640, 480));
         scaleTrackDiagramDialog = new ScaleTrackDiagramDialog(layoutEditor);
     }
@@ -57,7 +57,7 @@ public class ScaleTrackDiagramDialogTest {
     @Test
     public void testScaleTrackDiagramCanceled() {
 
-        scaleTrackDiagramDialog.scaleTrackDiagram();
+        ThreadingUtil.runOnGUI( () -> scaleTrackDiagramDialog.scaleTrackDiagram() );
         JFrameOperator jFrameOperator = new JFrameOperator(Bundle.getMessage("ScaleTrackDiagram"));
 
         new JButtonOperator(jFrameOperator, Bundle.getMessage("ButtonCancel")).doClick();  // NOI18N
@@ -67,7 +67,7 @@ public class ScaleTrackDiagramDialogTest {
     @Test
     public void testScaleTrackDiagram() {
 
-        scaleTrackDiagramDialog.scaleTrackDiagram();
+        ThreadingUtil.runOnGUI( () -> scaleTrackDiagramDialog.scaleTrackDiagram() );
         JFrameOperator jFrameOperator = new JFrameOperator(Bundle.getMessage("ScaleTrackDiagram"));
 
         // get ScaleTranslate button
