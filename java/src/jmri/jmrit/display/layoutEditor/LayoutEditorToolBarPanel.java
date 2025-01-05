@@ -22,6 +22,7 @@ import jmri.jmrit.logixng.GlobalVariable;
 import jmri.jmrit.logixng.GlobalVariableManager;
 import jmri.swing.NamedBeanComboBox;
 import jmri.util.MathUtil;
+import jmri.util.ThreadingUtil;
 import jmri.util.swing.JmriJOptionPane;
 
 import org.apache.commons.lang3.StringUtils;
@@ -825,23 +826,23 @@ public class LayoutEditorToolBarPanel extends JPanel implements Disposable {
     @Override
     public void dispose() {
         if ( logixngFrame != null ) {
-            logixngFrame.dispose();
+            ThreadingUtil.runOnGUI( () -> logixngFrame.dispose() );
         }
         logixngFrame = null;
         if ( audioFrame != null ) {
-            audioFrame.dispose();
+            ThreadingUtil.runOnGUI( () -> audioFrame.dispose() );
         }
         audioFrame = null;
         if ( sensorFrame != null ) {
-            sensorFrame.dispose();
+            ThreadingUtil.runOnGUI( () -> sensorFrame.dispose() );
         }
         sensorFrame = null;
         if ( signalFrame != null ) {
-            signalFrame.dispose();
+            ThreadingUtil.runOnGUI( () -> signalFrame.dispose() );
         }
         signalFrame = null;
         if ( iconFrame != null ) {
-            iconFrame.dispose();
+            ThreadingUtil.runOnGUI( () -> iconFrame.dispose() );
         }
         iconFrame = null;
     }
