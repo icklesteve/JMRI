@@ -1,5 +1,7 @@
 package jmri;
 
+import javax.annotation.CheckForNull;
+
 /**
  * A Logix is a group of Conditionals that monitor one or more conditions
  * (internal or on the layout). It services these Conditionals by installing and
@@ -113,6 +115,7 @@ public interface Logix extends NamedBean {
      * @param systemName The name of the Conditional object.
      * @return the Conditional object or null if not found.
      */
+    @CheckForNull
     Conditional getConditional(String systemName);
 
     /**
