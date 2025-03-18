@@ -39,7 +39,7 @@ abstract public class ConditionalList extends ConditionalEditBase {
         // make system name for new conditional
         int num = logix.getNumConditionals() + 1;
         Conditional conditional = null;
-        String cName = null;
+        String cName;
         while (conditional == null) {
             cName = logix.getSystemName() + "C" + Integer.toString(num);
             conditional = _conditionalManager.createNewConditional(cName, "");
@@ -106,7 +106,7 @@ abstract public class ConditionalList extends ConditionalEditBase {
             _newConditional = false;
             updateConditionalTableModel();
         }
-        TreeSet<String> newTargetNames = new TreeSet<String>();
+        TreeSet<String> newTargetNames = new TreeSet<>();
         loadReferenceNames(_conditionalFrame._variableList, newTargetNames);
         updateWhereUsed(_oldTargetNames, newTargetNames, _curConditional.getSystemName());
         closeConditionalFrame();

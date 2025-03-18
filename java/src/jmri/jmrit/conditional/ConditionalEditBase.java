@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.TreeSet;
 
+import javax.annotation.CheckForNull;
+
 import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
@@ -38,6 +40,7 @@ import jmri.SignalMast;
 import jmri.SignalMastManager;
 import jmri.Turnout;
 import jmri.TurnoutManager;
+import jmri.UserPreferencesManager;
 import jmri.NamedBean.DisplayOptions;
 import jmri.jmrit.beantable.LRouteTableAction;
 import jmri.jmrit.entryexit.DestinationPoints;
@@ -68,10 +71,8 @@ public class ConditionalEditBase {
      * @param sName the Logix system name being edited
      */
     public ConditionalEditBase(String sName) {
-//         _logixManager = InstanceManager.getNullableDefault(jmri.LogixManager.class);
-//         _conditionalManager = InstanceManager.getNullableDefault(jmri.ConditionalManager.class);
-        _logixManager = InstanceManager.getDefault(jmri.LogixManager.class);
-        _conditionalManager = InstanceManager.getDefault(jmri.ConditionalManager.class);
+        _logixManager = InstanceManager.getDefault(LogixManager.class);
+        _conditionalManager = InstanceManager.getDefault(ConditionalManager.class);
         _curLogix = _logixManager.getBySystemName(sName);
         loadSelectionMode();
     }
@@ -90,7 +91,7 @@ public class ConditionalEditBase {
     boolean _showReminder = false;
     boolean _suppressReminder = false;
     boolean _suppressIndirectRef = false;
-    private boolean _checkEnabled = jmri.InstanceManager.getDefault(jmri.configurexml.ShutdownPreferences.class).isStoreCheckEnabled();
+    private boolean _checkEnabled = InstanceManager.getDefault(jmri.configurexml.ShutdownPreferences.class).isStoreCheckEnabled();
 
     /**
      * Input selection names.
@@ -124,8 +125,8 @@ public class ConditionalEditBase {
      *
      * @since 4.7.3
      */
-    void loadSelectionMode() {
-        Object modeName = InstanceManager.getDefault(jmri.UserPreferencesManager.class).getProperty("jmri.jmrit.beantable.LogixTableAction", "Selection Mode"); // NOI18N
+    private void loadSelectionMode() {
+        Object modeName = InstanceManager.getDefault(UserPreferencesManager.class).getProperty("jmri.jmrit.beantable.LogixTableAction", "Selection Mode"); // NOI18N
         if (modeName == null) {
             _selectionMode = SelectionMode.USEMULTI;
         } else {
@@ -175,7 +176,7 @@ public class ConditionalEditBase {
     /**
      * Maintain a list of listeners -- normally only one.
      */
-    List<LogixEventListener> listenerList = new ArrayList<>();
+    private final List<LogixEventListener> listenerList = new ArrayList<>();
 
     /**
      * This contains a list of commands to be processed by the listener
@@ -750,7 +751,7 @@ public class ConditionalEditBase {
             String csName = x.getConditionalByNumberOrder(i);
 
             // If the conditional is a where used target, check scope
-            ArrayList<String> refList = InstanceManager.getDefault(jmri.ConditionalManager.class).getWhereUsed(csName);
+            ArrayList<String> refList = InstanceManager.getDefault(ConditionalManager.class).getWhereUsed(csName);
             if (refList != null) {
                 for (String refName : refList) {
                     Logix xRef = _conditionalManager.getParentLogix(refName);
@@ -790,13 +791,13 @@ public class ConditionalEditBase {
         TreeSet<String> deleteNames = new TreeSet<>(oldTargetNames);
         deleteNames.removeAll(newTargetNames);
         for (String deleteName : deleteNames) {
-            InstanceManager.getDefault(jmri.ConditionalManager.class).removeWhereUsed(deleteName, refName);
+            InstanceManager.getDefault(ConditionalManager.class).removeWhereUsed(deleteName, refName);
         }
 
         TreeSet<String> addNames = new TreeSet<>(newTargetNames);
         addNames.removeAll(oldTargetNames);
         for (String addName : addNames) {
-            InstanceManager.getDefault(jmri.ConditionalManager.class).addWhereUsed(addName, refName);
+            InstanceManager.getDefault(ConditionalManager.class).addWhereUsed(addName, refName);
         }
     }
 
@@ -806,8 +807,8 @@ public class ConditionalEditBase {
      */
     void showSaveReminder() {
         if (_showReminder && !_checkEnabled) {
-            if (InstanceManager.getNullableDefault(jmri.UserPreferencesManager.class) != null) {
-                InstanceManager.getDefault(jmri.UserPreferencesManager.class).
+            if (InstanceManager.getNullableDefault(UserPreferencesManager.class) != null) {
+                InstanceManager.getDefault(UserPreferencesManager.class).
                         showInfoMessage(Bundle.getMessage("ReminderTitle"), Bundle.getMessage("ReminderSaveString", // NOI18N
                                 Bundle.getMessage("MenuItemLogixTable")), // NOI18N
                                 "jmri.jmrit.beantable.LogixTableAction",
@@ -1115,12 +1116,12 @@ public class ConditionalEditBase {
         SignalHead h = null;
         if (name != null) {
             if (name.length() > 0) {
-                h = InstanceManager.getDefault(jmri.SignalHeadManager.class).getByUserName(name);
+                h = InstanceManager.getDefault(SignalHeadManager.class).getByUserName(name);
                 if (h != null) {
                     return name;
                 }
             }
-            h = InstanceManager.getDefault(jmri.SignalHeadManager.class).getBySystemName(name);
+            h = InstanceManager.getDefault(SignalHeadManager.class).getBySystemName(name);
         }
         if (h == null) {
             messageInvalidActionItemName(name, "SignalHead"); // NOI18N
@@ -1142,13 +1143,13 @@ public class ConditionalEditBase {
         SignalMast h = null;
         if (name != null) {
             if (name.length() > 0) {
-                h = InstanceManager.getDefault(jmri.SignalMastManager.class).getByUserName(name);
+                h = InstanceManager.getDefault(SignalMastManager.class).getByUserName(name);
                 if (h != null) {
                     return name;
                 }
             }
             try {
-                h = InstanceManager.getDefault(jmri.SignalMastManager.class).provideSignalMast(name);
+                h = InstanceManager.getDefault(SignalMastManager.class).provideSignalMast(name);
             } catch (IllegalArgumentException ex) {
                 h = null; // tested below
             }
@@ -1227,12 +1228,12 @@ public class ConditionalEditBase {
         Sensor s = null;
         if (name != null) {
             if (name.length() > 0) {
-                s = InstanceManager.getDefault(jmri.SensorManager.class).getByUserName(name);
+                s = InstanceManager.getDefault(SensorManager.class).getByUserName(name);
                 if (s != null) {
                     return name;
                 }
             }
-            s = InstanceManager.getDefault(jmri.SensorManager.class).getBySystemName(name);
+            s = InstanceManager.getDefault(SensorManager.class).getBySystemName(name);
         }
         if (s == null) {
             messageInvalidActionItemName(name, "Sensor"); // NOI18N
@@ -1250,6 +1251,7 @@ public class ConditionalEditBase {
      * @return the system or user name of the corresponding Light, null if not
      *         found
      */
+    @CheckForNull
     String validateLightReference(String name) {
         Light l = null;
         if (name != null) {
@@ -1277,6 +1279,7 @@ public class ConditionalEditBase {
      * @return the system or user name of the corresponding Conditional, null if
      *         not found
      */
+    @CheckForNull
     String validateConditionalReference(String name) {
         Conditional c = null;
         if (name != null) {
@@ -1304,6 +1307,7 @@ public class ConditionalEditBase {
      * @return the system or user name of the corresponding Logix, null if not
      *         found
      */
+    @CheckForNull
     String validateLogixReference(String name) {
         Logix l = null;
         if (name != null) {
@@ -1331,6 +1335,7 @@ public class ConditionalEditBase {
      * @return the system or user name of the corresponding Route, null if not
      *         found
      */
+    @CheckForNull
     String validateRouteReference(String name) {
         Route r = null;
         if (name != null) {
@@ -1358,6 +1363,7 @@ public class ConditionalEditBase {
      * @return the system or user name of the corresponding AudioManager, null
      *         if not found
      */
+    @CheckForNull
     String validateAudioReference(String name) {
         Audio a = null;
         if (name != null) {
@@ -1385,14 +1391,12 @@ public class ConditionalEditBase {
      * @return the system name of the corresponding EntryExit pair, null if not
      *         found
      */
-    String validateEntryExitReference(String name) {
-        NamedBean nb = null;
-        if (name != null) {
-            if (name.length() > 0) {
-                nb = jmri.InstanceManager.getDefault(jmri.jmrit.entryexit.EntryExitPairs.class).getNamedBean(name);
-                if (nb != null) {
-                    return nb.getSystemName();
-                }
+    @CheckForNull
+    String validateEntryExitReference( @CheckForNull String name) {
+        if ( name != null && name.length() > 0 ) {
+            NamedBean nb = InstanceManager.getDefault(EntryExitPairs.class).getNamedBean(name);
+            if (nb != null) {
+                return nb.getSystemName();
             }
         }
         messageInvalidActionItemName(name, "BeanNameEntryExit"); // NOI18N
@@ -1557,6 +1561,6 @@ public class ConditionalEditBase {
         return ConditionalEditBase.class.getName();
     }
 
-    private final static org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ConditionalEditBase.class);
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ConditionalEditBase.class);
 
 }

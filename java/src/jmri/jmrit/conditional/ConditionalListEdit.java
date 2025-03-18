@@ -86,7 +86,7 @@ public class ConditionalListEdit extends ConditionalList {
     /**
      * Create and/or initialize the Edit Logix pane.
      */
-    void makeEditLogixWindow() {
+    private void makeEditLogixWindow() {
         _editUserName = new JTextField(20);
         _editUserName.setText(_curLogix.getUserName());
         // clear conditional table if needed
@@ -178,32 +178,17 @@ public class ConditionalListEdit extends ConditionalList {
             // Conditional panel buttons - New Conditional
             JButton newConditionalButton = new JButton(Bundle.getMessage("NewConditionalButton"));  // NOI18N
             panel42.add(newConditionalButton);
-            newConditionalButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    newConditionalPressed(e);
-                }
-            });
+            newConditionalButton.addActionListener(this::newConditionalPressed);
             newConditionalButton.setToolTipText(Bundle.getMessage("NewConditionalButtonHint"));  // NOI18N
             // Conditional panel buttons - Reorder
             JButton reorderButton = new JButton(Bundle.getMessage("ReorderButton"));  // NOI18N
             panel42.add(reorderButton);
-            reorderButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    reorderPressed(e);
-                }
-            });
+            reorderButton.addActionListener(this::reorderPressed);
             reorderButton.setToolTipText(Bundle.getMessage("ReorderButtonHint"));  // NOI18N
             // Conditional panel buttons - Calculate
             JButton calculateButton = new JButton(Bundle.getMessage("CalculateButton"));  // NOI18N
             panel42.add(calculateButton);
-            calculateButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    calculatePressed(e);
-                }
-            });
+            calculateButton.addActionListener(this::calculatePressed);
             calculateButton.setToolTipText(Bundle.getMessage("CalculateButtonHint"));  // NOI18N
             panel4.add(panel42);
             Border panel4Border = BorderFactory.createEtchedBorder();
@@ -215,22 +200,12 @@ public class ConditionalListEdit extends ConditionalList {
             // Bottom Buttons - Done Logix
             JButton done = new JButton(Bundle.getMessage("ButtonDone"));  // NOI18N
             panel5.add(done);
-            done.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    donePressed(e);
-                }
-            });
+            done.addActionListener(this::donePressed);
             done.setToolTipText(Bundle.getMessage("DoneButtonHint"));  // NOI18N
             // Delete Logix
             JButton delete = new JButton(Bundle.getMessage("ButtonDelete"));  // NOI18N
             panel5.add(delete);
-            delete.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    deletePressed(e);
-                }
-            });
+            delete.addActionListener(this::deletePressed);
             delete.setToolTipText(Bundle.getMessage("DeleteLogixButtonHint"));  // NOI18N
             contentPane.add(panel5);
         }
@@ -320,8 +295,8 @@ public class ConditionalListEdit extends ConditionalList {
         // are there Conditionals to calculate?
         if (_numConditionals > 0) {
             // There are conditionals to calculate
-            String cName = "";
-            Conditional c = null;
+            String cName;
+            Conditional c;
             for (int i = 0; i < _numConditionals; i++) {
                 cName = _curLogix.getConditionalByNumberOrder(i);
                 if (cName != null) {
@@ -490,7 +465,8 @@ public class ConditionalListEdit extends ConditionalList {
         // deactivate this Logix
         _curLogix.deActivateLogix();
 
-        _conditionalFrame = new ConditionalEditFrame(Bundle.getMessage("TitleEditConditional"), _curConditional, this);  // NOI18N
+        _conditionalFrame = new ConditionalEditFrame(
+            Bundle.getMessage("TitleEditConditional"), _curConditional, this);  // NOI18N
         _oldTargetNames.clear();
         loadReferenceNames(_conditionalFrame._variableList, _oldTargetNames);
 
@@ -511,40 +487,26 @@ public class ConditionalListEdit extends ConditionalList {
 
         JButton updateButton = new JButton(Bundle.getMessage("ButtonUpdate"));  // NOI18N
         panel.add(updateButton);
-        updateButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                _conditionalFrame.updateConditionalPressed(e);
-            }
-        });
+        updateButton.addActionListener( _conditionalFrame::updateConditionalPressed);
         updateButton.setToolTipText(Bundle.getMessage("UpdateConditionalButtonHint"));  // NOI18N
         // Cancel
         JButton cancelButton = new JButton(Bundle.getMessage("ButtonCancel"));  // NOI18N
         panel.add(cancelButton);
-        cancelButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                _conditionalFrame.cancelConditionalPressed();
-            }
-        });
+        cancelButton.addActionListener( e -> _conditionalFrame.cancelConditionalPressed());
         cancelButton.setToolTipText(Bundle.getMessage("CancelConditionalButtonHint"));  // NOI18N
 
         // add Delete Conditional button to bottom panel
         JButton deleteButton = new JButton(Bundle.getMessage("ButtonDelete"));  // NOI18N
         panel.add(deleteButton);
-        deleteButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                deleteConditionalPressed();
-            }
-        });
+        deleteButton.addActionListener( e -> deleteConditionalPressed());
         deleteButton.setToolTipText(Bundle.getMessage("DeleteConditionalButtonHint"));  // NOI18N
 
         return panel;
     }
 
     @Override
-    boolean updateConditional(String uName, Conditional.AntecedentOperator logicType, boolean trigger, String antecedent) {
+    boolean updateConditional(String uName, Conditional.AntecedentOperator logicType,
+            boolean trigger, String antecedent) {
         log.debug("updateConditional");
         return super.updateConditional(uName, _curLogix, logicType, trigger, antecedent);
     }
@@ -557,7 +519,7 @@ public class ConditionalListEdit extends ConditionalList {
     }
 
     boolean checkConditionalUserName(String uName) {
-        if ((uName != null) && (!(uName.equals("")))) {
+        if ((uName != null) && (!(uName.isEmpty()))) {
             Conditional p = _conditionalManager.getByUserName(_curLogix, uName);
             if (p != null) {
                 // Conditional with this user name already exists
@@ -591,7 +553,7 @@ public class ConditionalListEdit extends ConditionalList {
     /**
      * Table model for Conditionals in the Edit Logix pane.
      */
-    public class ConditionalTableModel extends AbstractTableModel implements
+    private class ConditionalTableModel extends AbstractTableModel implements
             PropertyChangeListener {
 
         public static final int SNAME_COLUMN = 0;
@@ -602,16 +564,16 @@ public class ConditionalListEdit extends ConditionalList {
 
         public static final int BUTTON_COLUMN = 3;
 
-        public ConditionalTableModel() {
+        ConditionalTableModel() {
             super();
-            _conditionalManager.addPropertyChangeListener(this);
+            _conditionalManager.addPropertyChangeListener(ConditionalTableModel.this);
             updateConditionalListeners();
         }
 
-        synchronized void updateConditionalListeners() {
+        private synchronized void updateConditionalListeners() {
             // first, remove listeners from the individual objects
-            String sNam = "";
-            Conditional c = null;
+            String sNam;
+            Conditional c;
             _numConditionals = _curLogix.getNumConditionals();
             for (int i = 0; i < _numConditionals; i++) {
                 // if object has been deleted, it's not here; ignore it
@@ -633,7 +595,7 @@ public class ConditionalListEdit extends ConditionalList {
 
         @Override
         public void propertyChange(java.beans.PropertyChangeEvent e) {
-            if (e.getPropertyName().equals("length")) {  // NOI18N
+            if (Manager.PROPERTY_LENGTH.equals(e.getPropertyName())) {
                 // a new NamedBean is available in the manager
                 updateConditionalListeners();
                 fireTableDataChanged();
@@ -780,7 +742,7 @@ public class ConditionalListEdit extends ConditionalList {
                     // Use separate Runnable so window is created on top
                     class WindowMaker implements Runnable {
 
-                        private int _row;
+                        private final int _row;
 
                         WindowMaker(int r) {
                             _row = r;
@@ -816,10 +778,10 @@ public class ConditionalListEdit extends ConditionalList {
                                 continue;
                             }
                             List<ConditionalVariable> varList = cRef.getCopyOfStateVariables();
-                            for (ConditionalVariable var : varList) {
+                            for (ConditionalVariable condVar : varList) {
                                 // Find the affected conditional variable
-                                if (var.getName().equals(sName)) {
-                                    var.setGuiName( (uName.length() > 0) ? uName : sName );
+                                if (condVar.getName().equals(sName)) {
+                                    condVar.setGuiName( (uName.length() > 0) ? uName : sName );
                                 }
                             }
                             cRef.setStateVariables(varList);
