@@ -203,6 +203,8 @@ public class LinkedWarrantTest {
         });
         assertTrue(retVal);
 
+        ww.dispose();
+
         JUnitUtil.waitThreadTerminated("WestToEast Killer");
 
     }
@@ -225,7 +227,7 @@ public class LinkedWarrantTest {
 
         NXFrameTest.setAndConfirmSensorAction(sensor1, Sensor.ACTIVE, _OBlockMgr.getBySystemName("OB1"));
 
-        WarrantTableFrame tableFrame = WarrantTableFrame.getDefault();
+        WarrantTableFrame tableFrame = ThreadingUtil.runOnGUIwithReturn( () -> WarrantTableFrame.getDefault());
         assertNotNull(tableFrame,"tableFrame");
 
         Warrant outWarrant = _warrantMgr.getWarrant("WestToEastLink");
@@ -247,7 +249,8 @@ public class LinkedWarrantTest {
 
         // WarrantTable.runTrain() returns a string that is not null if the
         // warrant can't be started
-        assertNull(tableFrame.runTrain(outWarrant, Warrant.MODE_RUN),"Warrant starts"); // start run
+        assertNull(ThreadingUtil.runOnGUIwithReturn( () ->
+            tableFrame.runTrain(outWarrant, Warrant.MODE_RUN)),"Warrant starts"); // start run
 
         JUnitUtil.waitFor(() -> {
             String m =  outWarrant.getRunningMessage();
@@ -443,7 +446,10 @@ public class LinkedWarrantTest {
         assertTrue(retVal);
         
         www.dispose();
-        
+
+
+        JUnitUtil.waitFor( () -> w.getState() == -1, "tinker warrant terminated");
+
     }
 
     @BeforeEach
