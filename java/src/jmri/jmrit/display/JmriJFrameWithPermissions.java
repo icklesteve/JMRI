@@ -8,6 +8,7 @@ import javax.swing.*;
 import jmri.InstanceManager;
 import jmri.PermissionManager;
 import jmri.util.JmriJFrame;
+import jmri.util.ThreadingUtil;
 import jmri.util.swing.*;
 
 /**
@@ -100,7 +101,7 @@ public class JmriJFrameWithPermissions extends JmriJFrame {
         }
         // Save the bounds before pack() since pack() might resize the panel
         Rectangle bounds = getBounds();
-        pack();
+        ThreadingUtil.runOnGUI(this::pack);
         if (_keepSize) {
             setBounds(bounds);
         } else {
