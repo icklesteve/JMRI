@@ -53,6 +53,7 @@ public class LinkedWarrantTest {
         // OBlock of route
         String[] route = {"OB12", "OB1", "OB3", "OB5", "OB6", "OB7", "OB9", "OB11", "OB12"};
         OBlock block = _OBlockMgr.getOBlock("OB12");
+        assertNotNull(block);
 
         // WarrantTable.runTrain() returns a string that is not null if the
         // warrant can't be started
@@ -144,12 +145,11 @@ public class LinkedWarrantTest {
         final Warrant warrant = _warrantMgr.getWarrant("Loop&Fred");
         assertNotNull(warrant,"warrant");
 
-        ThreadingUtil.runOnGUI(() -> {
-            WarrantTableFrame tableFrame = WarrantTableFrame.getDefault();
-            // WarrantTable.runTrain() returns a string that is not null if the
-            // warrant can't be started
-            assertNull(tableFrame.runTrain(warrant, Warrant.MODE_RUN),"Warrant starts"); // start run
-        });
+        WarrantTableFrame tableFrame = ThreadingUtil.runOnGUIwithReturn(() -> WarrantTableFrame.getDefault());
+        // WarrantTable.runTrain() returns a string that is not null if the
+        // warrant can't be started
+        assertNull( ThreadingUtil.runOnGUIwithReturn(() ->
+            tableFrame.runTrain(warrant, Warrant.MODE_RUN)),"Warrant starts"); // start run
 
         JUnitUtil.waitFor(() -> {
             String m =  warrant.getRunningMessage();
@@ -179,10 +179,11 @@ public class LinkedWarrantTest {
         JUnitUtil.waitFor(() -> {
             String m =  ww.getRunningMessage();
             return m.endsWith("Cmd #9.");
-        }, "Train Fred starts to move at 8th command");
+        }, "Train Fred starts to move at 8th command, was " + ww.getRunningMessage());
 
         String[] route2 = {"OB1", "OB3", "OB5", "OB6", "OB7", "OB9", "OB11"};
         final OBlock block = _OBlockMgr.getOBlock("OB11");
+        assertNotNull(block);
 
         assertDoesNotThrow( () -> {
             assertEquals(block.getSensor(),
@@ -231,11 +232,18 @@ public class LinkedWarrantTest {
         assertNotNull(outWarrant,"WestWarrant");
         Warrant backWarrant = _warrantMgr.getWarrant("EastToWestLink");
 
+        OBlock block1 = _OBlockMgr.getOBlock("OB1");
+        assertNotNull(block1);
+
+        OBlock block11 = _OBlockMgr.getOBlock("OB11");
+        assertNotNull(block11);
+
         // OBlock of route
         String[] routeOut = {"OB1", "OB3", "OB5", "OB6", "OB7", "OB9", "OB11"};
-        Sensor outEndSensor = _OBlockMgr.getOBlock("OB11").getSensor();
+        Sensor outEndSensor = block11.getSensor();
+
         String[] routeBack = {"OB11", "OB9", "OB7", "OB6", "OB5", "OB3", "OB1"};
-        Sensor backEndSensor = _OBlockMgr.getOBlock("OB1").getSensor();
+        Sensor backEndSensor = block1.getSensor();
 
         // WarrantTable.runTrain() returns a string that is not null if the
         // warrant can't be started
@@ -255,7 +263,7 @@ public class LinkedWarrantTest {
         // It takes 500+ milliseconds per block to execute NXFrameTest.runtimes()
         // i.e. wait at least 600 * (route.length - 1) for return
 
-        String outBlockName = _OBlockMgr.getOBlock("OB11").getDisplayName();
+        String outBlockName = block11.getDisplayName();
         JUnitUtil.waitFor(() -> {
             String m = tableFrame.getStatus();
             return m.equals(Bundle.getMessage("warrantComplete",
@@ -279,7 +287,7 @@ public class LinkedWarrantTest {
             String m = tableFrame.getStatus();
             return m.equals(Bundle.getMessage("warrantComplete",
                     backWarrant.getTrainName(), backWarrant.getDisplayName(),
-                    _OBlockMgr.getOBlock("OB1").getDisplayName()));
+                    block1.getDisplayName()));
         }, "EastToWestLink finished second leg back");
 
         JUnitUtil.waitFor(() -> {
@@ -375,6 +383,7 @@ public class LinkedWarrantTest {
        // OBlock of route
         String[] route1 = {"OB0", "OB1", "OB2", "OB3", "OB4", "OB5", "OB10"};
         OBlock block10 = _OBlockMgr.getOBlock("OB10");
+        assertNotNull(block10);
 
         // Run the train, then checks end location
         assertDoesNotThrow( () -> {
@@ -394,6 +403,7 @@ public class LinkedWarrantTest {
 
         String[] route2 = {"OB7", "OB3", "OB2", "OB1"};
         OBlock block1 = _OBlockMgr.getOBlock("OB1");
+        assertNotNull(block1);
 
         assertDoesNotThrow( () -> {
             assertEquals(block1.getSensor(),
@@ -411,6 +421,7 @@ public class LinkedWarrantTest {
 
         String[] route3 = {"OB6", "OB3", "OB4", "OB5"};
         OBlock block5 = _OBlockMgr.getOBlock("OB5");
+        assertNotNull(block5);
 
         assertDoesNotThrow( () -> {
             assertEquals(block5.getSensor(),
