@@ -45,7 +45,6 @@ import jmri.jmrit.display.palette.ItemPalette;
 import jmri.jmrit.picker.PickListModel;
 import jmri.jmrit.picker.PickPanel;
 import jmri.util.JmriJFrame;
-import jmri.util.ThreadingUtil;
 import jmri.util.swing.JmriJOptionPane;
 import jmri.util.swing.JmriMouseEvent;
 import jmri.util.swing.JmriMouseListener;
@@ -579,10 +578,8 @@ public class TrackerTableAction extends AbstractAction implements PropertyChange
                 }
             });
             setLocation(0, 100);
-            ThreadingUtil.runOnGUI( () -> {
-                pack();
-                setVisible(true);
-            });
+            setVisible(true);
+            pack();
         }
 
         private JPanel makeButtonPanel() {
