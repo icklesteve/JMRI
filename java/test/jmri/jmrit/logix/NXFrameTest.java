@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * TODO - test error conditions
  */
 @Timeout(30)
-@DisabledIfSystemProperty(named ="java.awt.headless", matches ="true")
+@jmri.util.junit.annotations.DisabledIfHeadless
 public class NXFrameTest {
 
     private OBlockManager _OBlockMgr;
@@ -42,13 +42,13 @@ public class NXFrameTest {
 
     @Test
     @DisabledIfSystemProperty(named ="jmri.skipTestsRequiringSeparateRunning", matches ="true")
-    public void testRoutePanel() throws Exception {
+    public void testRoutePanel() {
         NXFrame nxFrame = new NXFrame();
         assertNotNull( nxFrame, "NXFrame");
 
         JFrameOperator jfo = new JFrameOperator(nxFrame);
 
-        nxFrame.setVisible(true);
+        ThreadingUtil.runOnGUI( () -> nxFrame.setVisible(true));
         JemmyUtil.pressButton(jfo, Bundle.getMessage("Calculate"));
 
         JemmyUtil.confirmJOptionPane(jfo, Bundle.getMessage("WarningTitle"), Bundle.getMessage("SetEndPoint", Bundle.getMessage("OriginBlock")), "OK");
@@ -61,7 +61,7 @@ public class NXFrameTest {
 
         JemmyUtil.confirmJOptionPane(jfo, Bundle.getMessage("WarningTitle"), Bundle.getMessage("SetEndPoint", Bundle.getMessage("OriginBlock")), "OK");
 
-        jfo.requestClose();
+        JUnitUtil.dispose(nxFrame);
         jfo.waitClosed();
     }
 
@@ -79,7 +79,7 @@ public class NXFrameTest {
         _sensorMgr = InstanceManager.getDefault(SensorManager.class);
 
         NXFrame nxFrame = new NXFrame();
-        nxFrame.setVisible(true);
+        ThreadingUtil.runOnGUI( () -> nxFrame.setVisible(true));
 
         JFrameOperator nfo = new JFrameOperator(nxFrame);
 
@@ -132,6 +132,11 @@ public class NXFrameTest {
             return true;
         });
         assertTrue(retVal);
+
+        // close Warrant Table
+        JFrameOperator jfo = new JFrameOperator(WarrantTableFrame.getDefault());
+        JUnitUtil.dispose(jfo.getWindow());
+        jfo.waitClosed();
     }
 
     @Test
@@ -154,7 +159,7 @@ public class NXFrameTest {
         OBlock block = _OBlockMgr.getBySystemName("OB0");
 
         NXFrame nxFrame = new NXFrame();
-        nxFrame.setVisible(true);
+        ThreadingUtil.runOnGUI( () -> nxFrame.setVisible(true));
 
         JFrameOperator nfo = new JFrameOperator(nxFrame);
 
@@ -238,8 +243,11 @@ public class NXFrameTest {
         // OBlock sensor names
         String[] route = {"OB0", "OB1", "OB2", "OB3", "OB7", "OB5", "OB10"};
         block = _OBlockMgr.getOBlock("OB10");
+        assertNotNull(block);
+        Sensor sb10 = block.getSensor();
+        assertNotNull(sb10);
         // runtimes() in next line runs the train, then checks location
-        assertEquals( block.getSensor().getDisplayName(),
+        assertEquals( sb10.getDisplayName(),
             runtimes(route, _OBlockMgr).getDisplayName(), "Train in last block");
 
         ThreadingUtil.runOnGUI(() -> {
@@ -258,6 +266,10 @@ public class NXFrameTest {
             return true;
         });
         assertTrue(retVal);
+
+        // close Create eNtry/eXit Warrant
+        JUnitUtil.dispose(nxFrame);
+        jfo.waitClosed();
     }
 
     @Test
@@ -296,8 +308,11 @@ public class NXFrameTest {
        // OBlock sensor names
         String[] route = {"OB3", "OB4", "OB5", "OB10", "OB0", "OB1", "OB2", "OB3"};
         OBlock block = _OBlockMgr.getOBlock("OB3");
+        assertNotNull(block);
+        Sensor sb3 = block.getSensor();
+        assertNotNull(sb3);
         // runtimes() in next line runs the train, then checks location
-        assertEquals( block.getSensor().getDisplayName(),
+        assertEquals( sb3.getDisplayName(),
             runtimes(route, _OBlockMgr).getDisplayName(), "Train in last block");
 
         // passed test - cleanup.  Do it here so failure leaves traces.
@@ -359,8 +374,11 @@ public class NXFrameTest {
        // OBlock sensor names
         String[] route1 = {"OB1", "OB6", "OB3"};
         final OBlock block3 = _OBlockMgr.getOBlock("OB3");
+        assertNotNull(block3);
+        Sensor sb3 = block3.getSensor();
+        assertNotNull(sb3);
         // runtimes() in next line runs the train, then checks location
-        assertEquals( block3.getSensor().getDisplayName(),
+        assertEquals( sb3.getDisplayName(),
             runtimes(route1,_OBlockMgr).getDisplayName(), "Train in block OB3");
 
         warrant.controlRunTrain(Warrant.HALT); // user interrupts script
@@ -383,8 +401,11 @@ public class NXFrameTest {
 
         String[] route2 = {"OB3", "OB7", "OB5"};
         OBlock block5 = _OBlockMgr.getOBlock("OB5");
+        assertNotNull(block5);
+        Sensor sb5 = block5.getSensor();
+        assertNotNull(sb5);
         // runtimes() in next line runs the train, then checks location
-        assertEquals( block5.getSensor().getDisplayName(),
+        assertEquals( sb5.getDisplayName(),
             runtimes(route2, _OBlockMgr).getDisplayName(), "Train in last block");
 
         // passed test - cleanup.  Do it here so failure leaves traces.
@@ -423,14 +444,38 @@ public class NXFrameTest {
         return sensor;
     }
 
+    /**
+     * Simulates the movement of a warranted train over its route.
+     * <p>Works through a list of OBlocks, gets its sensor,
+     * activates it, then inactivates the previous OBlock sensor.
+     * Leaves last sensor ACTIVE to show the train stopped there.
+     * @param route Array of OBlock names of the route
+     * @param penultimateBlockSensor the Sensor to set active when train in the penultimate block of the route.
+     * @param penultimateBlock the OBlock to ensure occupied when the penultimateBlockSensor goes active.
+     * @param mgr OBLock manager
+     * @return active end sensor
+     */
+    protected static Sensor runtimesChain(String[] route, Sensor penultimateBlockSensor, String penultimateBlock, OBlockManager mgr) {
+        Sensor sensor = null;
+        for (int i = 1; i < route.length; i++) {
+            if ( i == route.length-2 ) { // penultimate OBlock of route
+                setAndConfirmSensorAction(penultimateBlockSensor, Sensor.ACTIVE, mgr.getBySystemName(penultimateBlock));
+            }
+            sensor = moveToNextBlock(i, route, mgr);
+        }
+        return sensor;
+    }
+
     protected static Sensor moveToNextBlock(int idx, String[] route, OBlockManager mgr) {
         assertTrue( idx > 0 && idx < route.length , "Index "+ idx + " invalid ");
 
         OBlock fromBlock = mgr.getOBlock(route[idx - 1]);
+        assertNotNull(fromBlock);
         Sensor fromSensor = fromBlock.getSensor();
         assertNotNull( fromSensor, "fromSensor not found");
 
         OBlock toBlock = mgr.getOBlock(route[idx]);
+        assertNotNull(toBlock);
         Sensor toSensor = toBlock.getSensor();
         assertNotNull( toSensor, "toSensor not found");
 
@@ -493,7 +538,6 @@ public class NXFrameTest {
         JUnitUtil.removeMatchingThreads("Engineer(");
         JUnitUtil.deregisterBlockManagerShutdownTask();
         InstanceManager.getDefault(WarrantManager.class).dispose();
-        JUnitUtil.resetWindows(false,false);
         JUnitUtil.tearDown();
     }
 
