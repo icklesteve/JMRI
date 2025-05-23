@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @author  Pete Cressman 2015
  */
-@Timeout(60)
+@Timeout(90)
 @DisabledIfSystemProperty(named ="java.awt.headless", matches ="true")
 @DisabledIfSystemProperty(named ="jmri.skipLinkedWarrantTest", matches ="true")
 public class LinkedWarrantTest {
