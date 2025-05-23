@@ -26,7 +26,6 @@ import javax.swing.table.TableRowSorter;
 
 import jmri.InstanceManager;
 import jmri.Path;
-import jmri.util.ThreadingUtil;
 import jmri.util.swing.JmriJOptionPane;
 import jmri.util.swing.JmriMouseEvent;
 import jmri.util.swing.JmriMouseListener;
@@ -247,7 +246,7 @@ public class WarrantTableFrame extends jmri.util.JmriJFrame implements JmriMouse
         setJMenuBar(menuBar);
         addHelpMenu("package.jmri.jmrit.logix.WarrantTable", true);
 
-        ThreadingUtil.runOnGUI( () -> pack() );
+        pack();
     }
 
     private void haltAllAction() {
