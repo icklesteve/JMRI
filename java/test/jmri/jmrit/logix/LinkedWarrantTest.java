@@ -161,17 +161,14 @@ public class LinkedWarrantTest {
         OBlock lastBlockInRoute1 = _OBlockMgr.getOBlock("OB12");
         assertNotNull(lastBlockInRoute1);
 
-        // Run the train, then checks end location
-        assertDoesNotThrow( () -> {
-            assertEquals(lastBlockInRoute1.getSensor(),
-                NXFrameTest.runtimes(route1, _OBlockMgr),
-                "Train after first leg");
-        }, ("Exception running route1"));
-        
         // It takes 500+ milliseconds per block to execute NXFrameTest.runtimes()
-
         // "Loop&Fred" links to "WestToEast". Get start for "WestToEast" occupied quickly
-        NXFrameTest.setAndConfirmSensorAction(sensor1, Sensor.ACTIVE, _OBlockMgr.getBySystemName("OB1"));
+        // midway through the route we need to set OB1 occupied so that Fred can be auto-started
+        Sensor runFred = NXFrameTest.runtimesChain(route1, sensor1, "OB1", _OBlockMgr);
+        // Run the train, then checks end location
+        assertEquals(lastBlockInRoute1.getSensor(),
+            runFred,
+            "Train after first leg");
 
         Warrant ww = _warrantMgr.getWarrant("WestToEast");
         assertNotNull(ww,"warrant WestToEast exists");
