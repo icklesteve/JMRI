@@ -38,6 +38,7 @@ import jmri.jmrit.roster.RosterEntry;
 import jmri.jmrit.roster.swing.RosterEntrySelectorPanel;
 import jmri.util.DnDStringImportHandler;
 import jmri.util.JmriJFrame;
+import jmri.util.ThreadingUtil;
 import jmri.util.swing.JmriColorChooser;
 import jmri.util.swing.JmriJOptionPane;
 import jmri.util.swing.JmriMouseEvent;
@@ -183,7 +184,7 @@ abstract public class Editor extends JmriJFrameWithPermissions
         super(name, saveSize, savePosition);
         setName(name);
         _defaultToolTip = new ToolTip(null, 0, 0, null);
-        setVisible(false);
+        ThreadingUtil.runOnGUI( () -> setVisible(false));
         InstanceManager.getDefault(SignalHeadManager.class).addVetoableChangeListener(this);
         InstanceManager.getDefault(SignalMastManager.class).addVetoableChangeListener(this);
         InstanceManager.turnoutManagerInstance().addVetoableChangeListener(this);
