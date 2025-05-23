@@ -293,10 +293,10 @@ public class WarrantFrame extends WarrantRoute {
         makeMenus();
         setTitle(Bundle.getMessage("editing", _warrant.getDisplayName()));
         setContentPane(contentPane);
-        ThreadingUtil.runOnGUI( () -> setVisible(true) );
+        setVisible(true);
         _parameterPanel.setMaximumSize(_parameterPanel.getPreferredSize());
         _dirty = false;
-        ThreadingUtil.runOnGUI( () -> pack() );
+        pack();
         getContentPane().addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
