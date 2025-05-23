@@ -368,12 +368,11 @@ public class LinkedWarrantTest {
         Warrant w = _warrantMgr.getWarrant("Tinker");
         assertNotNull(w,"warrant");
 
-        ThreadingUtil.runOnGUI(() -> {
-            WarrantTableFrame tableFrame = WarrantTableFrame.getDefault();
-            // WarrantTable.runTrain() returns a string that is not null if the
-            // warrant can't be started
-            assertNull(tableFrame.runTrain(w, Warrant.MODE_RUN),"Warrant starts"); // start run
-        });
+        WarrantTableFrame tableFrame = ThreadingUtil.runOnGUIwithReturn( () -> WarrantTableFrame.getDefault());
+
+        // WarrantTable.runTrain() returns a string that is not null if the
+        // warrant can't be started
+        assertNull(tableFrame.runTrain(w, Warrant.MODE_RUN),"Warrant starts"); // start run
 
         JUnitUtil.waitFor(() -> {
             String m =  w.getRunningMessage();
@@ -399,7 +398,7 @@ public class LinkedWarrantTest {
         JUnitUtil.waitFor(() -> {
             String m =  ww.getRunningMessage();
             return m.endsWith("Cmd #8.");
-        }, "Evers starts to move at 8th command");
+        }, "Evers starts to move at 8th command but was: " + ww.getRunningMessage());
 
         String[] route2 = {"OB7", "OB3", "OB2", "OB1"};
         OBlock block1 = _OBlockMgr.getOBlock("OB1");
@@ -417,7 +416,7 @@ public class LinkedWarrantTest {
         JUnitUtil.waitFor(() -> {
             String m =  www.getRunningMessage();
             return m.endsWith("Cmd #8.") || m.endsWith("Cmd #9.") || m.endsWith("Cmd #10."); // in case runs fast
-        }, "Chance starts to move at 8th command");
+        }, "Chance starts to move at 8th command but was: " + www.getRunningMessage());
 
         String[] route3 = {"OB6", "OB3", "OB4", "OB5"};
         OBlock block5 = _OBlockMgr.getOBlock("OB5");
