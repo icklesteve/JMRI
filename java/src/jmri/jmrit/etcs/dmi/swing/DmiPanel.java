@@ -339,7 +339,7 @@ public class DmiPanel extends JPanel {
      * Get the displayed operating mode.
      * @return the current mode.
      */
-    protected int getMode(){
+    public int getMode(){
         return mode;
     }
 
