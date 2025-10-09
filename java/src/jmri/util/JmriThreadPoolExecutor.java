@@ -5,7 +5,7 @@ import java.util.concurrent.*;
 /**
  * @author Steve Young Copyright (C) 2024
  */
-public class JmriThreadPoolExecutor extends ThreadPoolExecutor {
+public class JmriThreadPoolExecutor extends ThreadPoolExecutor implements AutoCloseable {
 
     private final String threadName;
 
@@ -40,6 +40,11 @@ public class JmriThreadPoolExecutor extends ThreadPoolExecutor {
             log.error("{} Exception in task execution: {}", threadName, r, t);
         }
 
+    }
+
+    @Override
+    public void close() {
+        shutdownNow(); // Force-stop remaining threads
     }
 
     private static class ShutDownThreadFactory implements ThreadFactory {
