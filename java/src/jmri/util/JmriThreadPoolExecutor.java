@@ -5,7 +5,7 @@ import java.util.concurrent.*;
 /**
  * @author Steve Young Copyright (C) 2024
  */
-public class JmriThreadPoolExecutor extends ThreadPoolExecutor implements AutoCloseable {
+public class JmriThreadPoolExecutor extends ThreadPoolExecutor {
 
     private final String threadName;
 
