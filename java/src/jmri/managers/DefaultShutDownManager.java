@@ -343,39 +343,36 @@ public class DefaultShutDownManager extends Bean implements ShutDownManager {
         if ( sDrunnables.isEmpty() ) {
             return;
         }
-        // use a custom Executor which checks the Task output for Exceptions.
-        JmriThreadPoolExecutor executor = new JmriThreadPoolExecutor(sDrunnables.size(), threadName);
-        List<Future<?>> complete = new ArrayList<>();
-        long timeoutEnd = System.currentTimeMillis() + tasksTimeOutMilliSec;
 
-        sDrunnables.forEach( runnable -> complete.add(executor.submit(runnable)));
+        // Use try-with-resources to auto-close the executor
+        try (JmriThreadPoolExecutor executor = new JmriThreadPoolExecutor(sDrunnables.size(), threadName)) {
+            List<Future<?>> complete = new ArrayList<>();
+            long timeoutEnd = System.currentTimeMillis() + tasksTimeOutMilliSec;
 
-        executor.shutdown(); // no more tasks allowed from here, starts the threads.
+            // Submit tasks
+            sDrunnables.forEach(runnable -> complete.add(executor.submit(runnable)));
 
-         // Handle individual task timeouts
-        for (Future<?> future : complete) {
-            long remainingTime = timeoutEnd - System.currentTimeMillis(); // Calculate remaining time
+            executor.shutdown(); // no more tasks allowed from here, starts the threads.
 
-            if (remainingTime <= 0) {
-                log.error("Timeout reached before all tasks were completed {} {}", threadName, future);
-                break;
+            // Handle task timeouts
+            for (Future<?> future : complete) {
+                long remainingTime = timeoutEnd - System.currentTimeMillis();
+                if (remainingTime <= 0) {
+                    log.error("Timeout reached before all tasks were completed {} {}", threadName, future);
+                    break;
+                }
+                try {
+                    future.get(remainingTime, TimeUnit.MILLISECONDS);
+                } catch (TimeoutException te) {
+                    log.error("{} Task timed out: {}", threadName, future);
+                } catch (InterruptedException ie) {
+                    // log.error("{} Task was interrupted: {}", threadName, future);
+                    Thread.currentThread().interrupt();
+                } catch (ExecutionException ee) {
+                    // log.error("{} Task threw an exception: {}", threadName, future, ee.getCause());
+                }
             }
-
-            try {
-                // Attempt to get the result of each task within the remaining time
-                future.get(remainingTime, TimeUnit.MILLISECONDS);
-            } catch (TimeoutException te) {
-                log.error("{} Task timed out: {}", threadName, future);
-            } catch (InterruptedException ie) {
-                Thread.currentThread().interrupt();
-                // log.error("{} Task was interrupted: {}", threadName, future);
-            } catch (ExecutionException ee) {
-                // log.error("{} Task threw an exception: {}", threadName, future, ee.getCause());
-            }
-        }
-
-        executor.shutdownNow(); // do not leave Threads hanging before exit, force stop.
-
+        } // Executor auto-closes here (calls shutdownNow() if needed)
     }
 
     /**
