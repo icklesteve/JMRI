@@ -48,6 +48,8 @@ public class RunCucumberIT {
     public static void afterTests() {
         BrowserFactory.closeAllDrivers();
         assertTrue(JUnitUtil.resetZeroConfServiceManager());
+        org.junit.jupiter.api.Assertions.fail("Where do tests fail in CI ?", new Exception("Trace:"));
+        
         JUnitUtil.clearShutDownManager();
         JUnitUtil.tearDown();
     }
