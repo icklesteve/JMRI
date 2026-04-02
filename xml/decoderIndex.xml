@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet href="/xml/XSLT/DecoderID.xsl" type="text/xsl"?>
 <decoderIndex-config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://jmri.org/xml/schema/decoder-4-15-2.xsd">
-  <!--Written by JMRI version 5.15.4plus+jake+20260313T1317Z+R68de9515494 on Fri Mar 13 09:18:11 EDT 2026-->
-  <decoderIndex version="703">
+  <!--Written by JMRI version 5.15.5plus+jake+20260326T0522Z+R5ceea5f1320 on Wed Mar 25 22:22:56 PDT 2026-->
+  <decoderIndex version="705">
     <!--The manufacturer list is from the nmra_mfg_list.xml file-->
     <mfgList nmraListDate="2024-12-10" updated="2025-03-30" lastadd="171">
       <manufacturer mfg="NMRA" mfgID="999" />
@@ -39589,7 +39589,7 @@
         </model>
       </family>
       <family name="Zimo Function Decoders" mfg="Zimo" file="Zimo_Unified_software_v32_MX685.xml">
-        <model model="MX685 version 32+" lowVersionID="32" highVersionID="32" productID="226" numOuts="8" numFns="14">
+        <model model="MX685 version 32+" lowVersionID="32" highVersionID="40" productID="226" numOuts="8" numFns="14">
           <output name="1" label="Front Light" />
           <output name="2" label="Rear Light" />
           <output name="3" label="FO 1" />

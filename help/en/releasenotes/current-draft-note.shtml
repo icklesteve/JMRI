@@ -126,7 +126,8 @@
 
         <h4><a href="http://openlcb.org">OpenLCB</a> / LCC</h4>
             <ul>
-                <li></li>
+                <li>Updated the OpenLCB_Java library to include an 
+                    improvement in how unknown-MTI messages are displayed.</li>
             </ul>
 
         <h4>Powerline</h4>
@@ -396,7 +397,7 @@
 
         <h4>ZIMO</h4>
             <ul>
-                <li></li>
+                <li>Improved how some recent Zimo decoder types are detected.</li>
             </ul>
 
         <h4>Miscellaneous</h4>
@@ -429,7 +430,18 @@
     <h3>DecoderPro</h3>
         <a id="DecoderPro" name="DecoderPro"></a>
         <ul>
-            <li></li>
+            <li>Added an option in the settings Roster pane, Programmer tab,
+                to drop detachable tabs for the programming panes.
+                </li>
+            <li>When you have a roster entry open for editing,
+                there are new entries in the File menu Import 
+                and Export submenus to export
+                "All Function Labels to CSV file..."
+                and import a
+                "CSV file of Function Labels...".
+                They do what you'd expect.</li>
+            <li>New permissions selection to allow/disallow adding/editing/removing
+                columns from the roster</li>
         </ul>
 
    <h3>Dispatcher</h3>
@@ -476,7 +488,7 @@
     <h3>LogixNG</h3>
         <a id="LogixNG" name="LogixNG"></a>
         <ul>
-          <li></li>
+          <li>Add <strong>Section</strong> and <strong>Transit</strong> to the bean listeners.</li>
         </ul>
 
     <h3>Meters and MeterFrames</h3>
@@ -488,7 +500,8 @@
     <h3>OperationsPro</h3>
         <a id="Operations" name="Operations"></a>
         <ul>
-            <li></li>
+            <li>The Yardmaster's window now allows you to add cars to the train at the yardmaster's location.</li>
+            <li>Fixed the departure time from a route location in the CSV Manifest file.</li>
         </ul>
 
     <h3>PanelPro</h3>
@@ -524,7 +537,8 @@
     <h3>Roster</h3>
         <a id="Roster" name="Roster"></a>
         <ul>
-            <li></li>
+            <li>Fixed a problem preventing the JMRI permissions from
+                properly controlling access to added columns.</li>
         </ul>
 
     <h3>Routes</h3>
