@@ -6,8 +6,6 @@ import jmri.jmrix.can.CanMessage;
 import jmri.jmrix.can.CanReply;
 import jmri.jmrix.can.adapters.gridconnect.GcTrafficController;
 import jmri.jmrix.can.cbus.CbusConstants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Traffic controller for the MERG variant of the GridConnect protocol.
@@ -40,7 +38,7 @@ public class MergTrafficController extends GcTrafficController {
      */
     @Override
     public CanReply decodeFromHardware(AbstractMRReply m) {
-        log.debug("Decoding from hardware");
+        log.debug("Decoding {} from hardware",m);
         MergReply gc = new MergReply();
         try {
             gc = (MergReply) m;
@@ -71,6 +69,6 @@ public class MergTrafficController extends GcTrafficController {
         return new MergReply();
     }
 
-    private static final Logger log = LoggerFactory.getLogger(MergTrafficController.class);
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MergTrafficController.class);
 
 }

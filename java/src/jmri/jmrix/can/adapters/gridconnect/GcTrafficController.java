@@ -1,6 +1,7 @@
 package jmri.jmrix.can.adapters.gridconnect;
 
 import java.io.DataInputStream;
+
 import jmri.jmrix.AbstractMRListener;
 import jmri.jmrix.AbstractMRMessage;
 import jmri.jmrix.AbstractMRReply;
@@ -8,8 +9,6 @@ import jmri.jmrix.can.CanListener;
 import jmri.jmrix.can.CanMessage;
 import jmri.jmrix.can.CanReply;
 import jmri.jmrix.can.TrafficController;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Traffic controller for the GridConnect protocol.
@@ -91,7 +90,7 @@ public class GcTrafficController extends TrafficController {
      */
     @Override
     public void sendCanMessage(CanMessage m, CanListener reply) {
-        log.debug("GcTrafficController sendCanMessage() {}", m.toString());
+        log.debug("GcTrafficController sendCanMessage() {}", m);
         sendMessage(m, reply);
     }
 
@@ -101,7 +100,7 @@ public class GcTrafficController extends TrafficController {
      */
     @Override
     public void sendCanReply(CanReply r, CanListener reply) {
-        log.debug("TrafficController sendCanReply() {}", r.toString());
+        log.debug("TrafficController sendCanReply() {}", r);
         notifyReply(r, reply);
     }
 
@@ -142,14 +141,13 @@ public class GcTrafficController extends TrafficController {
     @Override
     public CanReply decodeFromHardware(AbstractMRReply m) {
         GridConnectReply gc = new GridConnectReply();
-        log.debug("Decoding from hardware");
+        log.debug("Decoding {} from hardware", m);
         try {
             gc = (GridConnectReply) m;
         } catch(java.lang.ClassCastException cce){
-            log.error("{} cannot cast to a GridConnectReply",m);
+            log.error("{} cannot be cast to a GridConnectReply",m);
         }
-        CanReply ret = gc.createReply();
-        return ret;
+        return gc.createReply();
     }
 
     /**
@@ -194,7 +192,7 @@ public class GcTrafficController extends TrafficController {
         int num = r.getNumDataElements() - 1;
         //log.debug("endNormalReply checking "+(num+1)+" of "+(r.getNumDataElements()));
         if (r.getElement(num) == ';') {
-            log.debug("End of normal message detected");
+            log.debug("End of normal Reply detected in {}",r);
             return true;
         }
         return false;
@@ -227,10 +225,10 @@ public class GcTrafficController extends TrafficController {
                     char1 = readByteProtected(istream);
                 }
             }
-            //if (log.isDebugEnabled()) log.debug("char: "+(char1&0xFF)+" i: "+i);
+            log.trace("Reply byte char: {} i: {}",char1&0xFF,i);
             // if there was a timeout, flush any char received and start over
             if (flushReceiveChars) {
-                log.warn("timeout flushes receive buffer: {}", msg.toString());
+                log.warn("timeout flushes receive buffer: {}", msg);
                 msg.flush();
                 i = 0;  // restart
                 flushReceiveChars = false;
@@ -249,5 +247,5 @@ public class GcTrafficController extends TrafficController {
 
     private int gcState;
 
-    private static final Logger log = LoggerFactory.getLogger(GcTrafficController.class);
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(GcTrafficController.class);
 }
